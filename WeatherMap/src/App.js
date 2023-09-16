@@ -59,7 +59,7 @@ function Map() {
 
  const center = useMemo(() => ({ lat: -35.882762, lng: 144.217208 }), []);
   return (
-    <GoogleMap zoom={5}
+    <GoogleMap zoom={7}
     center={center}
     mapContainerClassName="map-container"
     onClick={(event) => {
@@ -72,7 +72,7 @@ function Map() {
                <MarkerF
                  key={element.id}
                  title={element.wsName}
-                 label={{text:`${element.id}`,color:'#fff', backgroundColor: "#7fffd4"}}
+                 label={{text:`${element.wsName}`,color:'#fff', backgroundColor: "#7fffd4"}}
                  position={{
                    lat: element.latitude,
                    lng: element.longitude
@@ -93,7 +93,7 @@ function Map() {
                      lng: selectedElement.longitude
                    }}
                   onCloseClick={() => {
-                    setSelectedElement(selectedElement);
+                    setSelectedElement(null);
                   }}
                 >
                   <div id={selectedElement.id}>
