@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMemo } from "react";
 import './App.css';
-import { GoogleMap, useLoadScript, MarkerF,InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, useLoadScript, MarkerF,InfoWindowF } from "@react-google-maps/api";
 function App() {
 const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -86,7 +86,7 @@ function Map() {
 
 
       {selectedElement && (
-                <InfoWindow
+                <InfoWindowF
                 id={selectedElement.id}
                    position={{
                      lat: selectedElement.latitude,
@@ -109,7 +109,7 @@ function Map() {
                         </span>
                     ) : null}
                   </div>
-                </InfoWindow>
+                </InfoWindowF>
               ) }
     </GoogleMap>
   );
