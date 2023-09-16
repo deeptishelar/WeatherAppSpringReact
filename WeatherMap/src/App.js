@@ -33,6 +33,7 @@ function Map() {
          })
          .then(data => {
             setData(data);
+            setSelectedElement(null);
          });
 
      };
@@ -40,11 +41,9 @@ function Map() {
      dataFetch();
    }, []);
  const [selectedElement, setSelectedElement] = useState(null);
-  const [activeMarker, setActiveMarker] = useState(null);
-  const [showInfoWindow, setInfoWindowFlag] = useState(true);
 
  const getWeatherInfo = async (station) => {
- fetch('http://localhost:8080/getWeatherInfo?wsId='+station.id)
+        fetch('http://localhost:8080/getWeatherInfo?wsId='+station.id)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -54,26 +53,31 @@ function Map() {
           .then(weatherInfo => {
              setWeatherInfo(weatherInfo);
              setVariableData(weatherInfo.dataList);
+             setSelectedElement(station)
           });
-
 	}
 
  const center = useMemo(() => ({ lat: -35.882762, lng: 144.217208 }), []);
   return (
-    <GoogleMap zoom={10} center={center} mapContainerClassName="map-container">
+    <GoogleMap zoom={5}
+    center={center}
+    mapContainerClassName="map-container"
+    onClick={(event) => {
+        setSelectedElement(null);
+       }
+     }>
 
    {data.map((element, index) => {
              return (
                <MarkerF
-                 key={index}
+                 key={element.id}
                  title={element.wsName}
-                 label={{text:`${element.wsName}`,color:'#fff', backgroundColor: "#7fffd4"}}
+                 label={{text:`${element.id}`,color:'#fff', backgroundColor: "#7fffd4"}}
                  position={{
                    lat: element.latitude,
                    lng: element.longitude
                  }}
                   onClick={(event) => {
-                      setSelectedElement(element);
                       getWeatherInfo(element)}
                   }
                />
@@ -81,32 +85,32 @@ function Map() {
            })}
 
 
-      {selectedElement ? (
+      {selectedElement && (
                 <InfoWindow
-                    options={{ width: 320 }}
+                id={selectedElement.id}
                    position={{
                      lat: selectedElement.latitude,
                      lng: selectedElement.longitude
                    }}
                   onCloseClick={() => {
-                    setSelectedElement(null);
+                    setSelectedElement(selectedElement);
                   }}
                 >
-                  <div id="info">
-                    <p><b>Name: </b>{weatherInfo.name}</p>
+                  <div id={selectedElement.id}>
+                    <p><b>Name: {weatherInfo.name}</b></p>
                     <p><b>Site: </b>{weatherInfo.site}</p>
                     <p><b>Portfolio: </b>{weatherInfo.portfolio}</p>
                     <p><b>Time: </b>{weatherInfo.timestamp}</p>
                     {variableData ? (
                         <span>
                          {variableData.map((element, index) => {
-                            return( <p> <b>{element.name}: </b>{element.value}{element.unit}</p>);
+                            return( <p id={element.varId}> <b>{element.name}: </b>{element.value}{element.unit}</p>);
                          })}
                         </span>
                     ) : null}
                   </div>
                 </InfoWindow>
-              ) : null}
+              ) }
     </GoogleMap>
   );
 }
