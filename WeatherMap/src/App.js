@@ -46,14 +46,20 @@ function Map() {
         fetch('http://localhost:8080/getWeatherInfo?wsId='+station.id)
           .then(response => {
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+             return response.json();
             }
             return response.json();
           })
           .then(weatherInfo => {
+             if(weatherInfo.code === null || weatherInfo.code === undefined)
+             {
              setWeatherInfo(weatherInfo);
              setVariableData(weatherInfo.dataList);
              setSelectedElement(station)
+             } else
+             {
+             alert(weatherInfo.message)
+             }
           });
 	}
 
