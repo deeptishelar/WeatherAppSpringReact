@@ -27,7 +27,7 @@ function WeatherAap() {
  const [selectedElement, setSelectedElement] = useState(null);
  const center = useMemo(() => ({ lat: -27.882762, lng: 144.217208 }), []);
  const [newCenter, setNewCenter] = useState(center)
- const [zoom, setZoom] = useState(5)
+ const [zoom, setZoom] = useState(5);
  useEffect(() => {
      const dataFetch = async () => {
        fetch('http://localhost:8080/getWeatherStationsForState?state='+state)
