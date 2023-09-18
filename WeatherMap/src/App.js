@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMemo } from "react";
 import './App.css';
 import { GoogleMap, useLoadScript, MarkerF,InfoWindowF } from "@react-google-maps/api";
+import { Select, MenuItem, InputLabel, FormHelperText } from '@material-ui/core';
 function App() {
 const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -10,21 +11,25 @@ const { isLoaded } = useLoadScript({
   return (
     <div className="App">
 
-       <Map/>
+       <WeatherAap/>
     </div>
 
   );
 }
 
-function Map() {
+function WeatherAap() {
 
  const [weatherInfo, setWeatherInfo] = React.useState([]);
+ const [all, setAll] = React.useState(['']);
+
  const [variableData, setVariableData] = React.useState([]);
 
+ const [state, setState] = React.useState([]);
  const [data, setData] = React.useState([]);
  useEffect(() => {
      const dataFetch = async () => {
-       fetch('http://localhost:8080/getWeatherStations')
+     console.log("use "+state);
+       fetch('http://localhost:8080/getWeatherStationsForState?state='+state)
          .then(response => {
            if (!response.ok) {
              throw new Error('Network response was not ok');
@@ -35,11 +40,9 @@ function Map() {
             setData(data);
             setSelectedElement(null);
          });
-
      };
-
      dataFetch();
-   }, []);
+   }, [state]);
  const [selectedElement, setSelectedElement] = useState(null);
 
  const getWeatherInfo = async (station) => {
@@ -53,19 +56,33 @@ function Map() {
           .then(weatherInfo => {
              if(weatherInfo.code === null || weatherInfo.code === undefined)
              {
-             setWeatherInfo(weatherInfo);
-             setVariableData(weatherInfo.dataList);
-             setSelectedElement(station)
-             } else
-             {
-             alert(weatherInfo.message)
-             }
+                 setWeatherInfo(weatherInfo);
+                 setVariableData(weatherInfo.dataList);
+                 setSelectedElement(station)
+                 } else
+                 {
+                 alert(weatherInfo.message)
+                 }
           });
 	}
 
- const center = useMemo(() => ({ lat: -35.882762, lng: 144.217208 }), []);
+ const filterStations = (event) => {
+    setState(event.target.value);
+ };
+
+ const center = useMemo(() => ({ lat: -27.882762, lng: 144.217208 }), []);
   return (
-    <GoogleMap zoom={7}
+  <>
+   <FormHelperText style={{fontSize: '1em',color: 'black', marginTop: 0, marginLeft: 10, backgroundColor: 'white'}}>Select a state</FormHelperText>
+     <Select defaultValue={all} displayEmpty label="State" style={{ marginTop: 5, marginLeft: 10 , backgroundColor: 'white'}} onChange={filterStations}>
+          <MenuItem value={'VIC'}>VIC</MenuItem>
+          <MenuItem value={'NSW'}>NSW</MenuItem>
+          <MenuItem value={'SA'}>SA</MenuItem>
+          <MenuItem value={'QLD'}>QLD</MenuItem>
+          <MenuItem value=""><em>All</em></MenuItem>
+        </Select>
+
+    <GoogleMap zoom={5}
     center={center}
     mapContainerClassName="map-container"
     onClick={(event) => {
@@ -84,7 +101,8 @@ function Map() {
                    lng: element.longitude
                  }}
                   onClick={(event) => {
-                      getWeatherInfo(element)}
+                      getWeatherInfo(element)
+                      }
                   }
                />
              );
@@ -117,7 +135,9 @@ function Map() {
                   </div>
                 </InfoWindowF>
               ) }
+
     </GoogleMap>
+    </>
   );
 }
 
